@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct PopularDestinationsView: View {
     let destinations: [Destination] = [
-        .init(name: "Paris", country: "France", imageName: "eiffel_tower"),
-        .init(name: "Tokyo", country: "Japan", imageName: "japan"),
-        .init(name: "New York", country: "USx", imageName: "new_york")
+        .init(name: "Paris", country: "France", imageName: "eiffel_tower", latitude: 48.859565, longitude: 2.353235),
+        .init(name: "Tokyo", country: "Japan", imageName: "japan", latitude: 35.679653, longitude: 139.771913),
+        .init(name: "New York", country: "USx", imageName: "new_york", latitude: 0, longitude: 0)
     ]
     
     var body: some View {
@@ -44,6 +45,14 @@ struct PopularDestinationDetailView: View {
     
     let destination: Destination
     
+    //@State var region = MKCoordinateRegion(center: .init(latitude: 0, longitude: 0), span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1))
+    @State var region: MKCoordinateRegion
+    
+    init(destination: Destination) {
+        self.destination = destination
+        self._region = State(initialValue: MKCoordinateRegion(center: .init(latitude: destination.latitude, longitude: destination.longitude), span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)))
+    }
+    
     var body: some View {
         ScrollView {
             Image(destination.imageName)
@@ -51,6 +60,7 @@ struct PopularDestinationDetailView: View {
                 .scaledToFill()
                 .frame(height: 200)
                 .clipped()
+            
             VStack(alignment: .leading) {
                 Text(destination.name)
                     .font(.system(size: 18, weight: .bold))
@@ -63,9 +73,19 @@ struct PopularDestinationDetailView: View {
                 }.padding(.top, 2)
                 Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
                     .padding(.top, 4)
+                    .font(.system(size: 14))
                 HStack { Spacer() }
             }
             .padding(.horizontal)
+            
+            HStack {
+                Text("Location")
+                    .font(.system(size: 18, weight: .semibold))
+                Spacer()
+            }.padding(.horizontal)
+            Map(coordinateRegion: $region)
+                .frame(height: 200)
+            
         }.navigationBarTitle(destination.name, displayMode: .inline)
     }
 }
@@ -102,7 +122,7 @@ struct PopularDestinationTile: View {
 struct PopularDestinationsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            PopularDestinationDetailView(destination: .init(name: "Paris", country: "France", imageName: "eiffel_tower"))
+            PopularDestinationDetailView(destination: .init(name: "Paris", country: "France", imageName: "eiffel_tower", latitude: 48.859565, longitude: 2.353235))
         }
         PopularDestinationsView()
     }

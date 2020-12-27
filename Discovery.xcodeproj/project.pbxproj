@@ -76,8 +76,8 @@
 		4ABB24B625970ED9009A5D1E /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				4ABB24B725970EF4009A5D1E /* Destination.swift */,
 				4ABB24BA25970F0A009A5D1E /* User.swift */,
+				4ABB24B725970EF4009A5D1E /* Destination.swift */,
 				4ABB24BD25970F11009A5D1E /* Restaurant.swift */,
 				4ABB24C025970F23009A5D1E /* Category.swift */,
 				4ABB24D8259887BE009A5D1E /* Place.swift */,
