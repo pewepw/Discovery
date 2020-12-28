@@ -63,11 +63,19 @@ struct PopularDestinationDetailView: View {
     
     var body: some View {
         ScrollView {
-            Image(destination.imageName)
-                .resizable()
-                .scaledToFill()
-                .frame(height: 200)
-                .clipped()
+            /*
+             TabView {
+                 Text("first")
+                 Text("second")
+                 Text("third")
+             }
+             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+             .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
+             .frame(height: 250)
+             */
+            
+             DestinationHeaderContainer()
+                 .frame(height: 250)
             
             VStack(alignment: .leading) {
                 Text(destination.name)
