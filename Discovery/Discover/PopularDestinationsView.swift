@@ -46,7 +46,15 @@ struct PopularDestinationDetailView: View {
     let destination: Destination
     
     //@State var region = MKCoordinateRegion(center: .init(latitude: 0, longitude: 0), span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1))
+    
     @State var region: MKCoordinateRegion
+    @State var isShowingAttractions = true
+    
+    let attractions: [Attraction] = [
+        .init(name: "Eiffel Tower", imageName: "eiffel_tower", latitude: 48.859565, longitude: 2.353235),
+        .init(name: "Champs-Elysees", imageName: "new_york", latitude: 48.866867, longitude: 2.311780),
+        .init(name: "Louvre Museum", imageName: "japan", latitude: 48.860288, longitude: 2.337789)
+    ]
     
     init(destination: Destination) {
         self.destination = destination
@@ -82,12 +90,58 @@ struct PopularDestinationDetailView: View {
                 Text("Location")
                     .font(.system(size: 18, weight: .semibold))
                 Spacer()
+                Button(action: {
+                    isShowingAttractions.toggle()
+                }, label: {
+                    Text("\(isShowingAttractions ? "Hide" : "Show") Attractions")
+                        .font(.system(size: 14, weight: .semibold))
+                })
+                Toggle("", isOn: $isShowingAttractions)
+                    .labelsHidden()
             }.padding(.horizontal)
-            Map(coordinateRegion: $region)
-                .frame(height: 200)
+            Map(coordinateRegion: $region, annotationItems: isShowingAttractions ? attractions : [], annotationContent: { attraction in
+                //MapMarker(coordinate: .init(latitude: attraction.latitude, longitude: attraction.longitude), tint: .blue)
+                MapAnnotation(coordinate: .init(latitude: attraction.latitude, longitude: attraction.longitude)) {
+                    CustomMapAnnotation(attraction: attraction)
+                }
+            })
+            .frame(height: 400)
             
         }.navigationBarTitle(destination.name, displayMode: .inline)
     }
+}
+
+struct CustomMapAnnotation: View {
+    
+    let attraction: Attraction
+    
+    var body: some View {
+        VStack {
+            Image(attraction.imageName)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 80, height: 60)
+                .cornerRadius(4)
+                .overlay(RoundedRectangle(cornerRadius: 4)
+                            .stroke(Color.blue))
+            Text(attraction.name)
+                .font(.system(size: 14, weight: .semibold))
+                .padding(.horizontal, 6)
+                .padding(.vertical, 4)
+                .background(LinearGradient(gradient: Gradient(colors: [Color.red, Color.blue]), startPoint: .leading, endPoint: .trailing))
+                .foregroundColor(.white)
+                .cornerRadius(4)
+                .overlay(RoundedRectangle(cornerRadius: 4)
+                            .stroke(Color.blue))
+        }.shadow(radius: 5)
+    }
+}
+
+struct Attraction : Identifiable {
+    var id = UUID().uuidString
+    
+    let name, imageName: String
+    let latitude, longitude: Double
 }
 
 struct PopularDestinationTile: View {
