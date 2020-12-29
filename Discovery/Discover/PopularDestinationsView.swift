@@ -41,7 +41,44 @@ struct PopularDestinationsView: View {
     }
 }
 
+struct DestinationDetails: Decodable {
+    let description: String
+    let photos: [String]
+}
+
+class DestinationDetailsViewModel: ObservableObject {
+    @Published var isLoading = true
+    @Published var destinationDetails: DestinationDetails?
+    
+    init(name: String) {
+        let urlString = "https://travel.letsbuildthatapp.com/travel_discovery/destination?name=\(name.lowercased())".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        
+        guard let url = URL(string: urlString) else {
+            self.isLoading = false
+            return
+        }
+        
+        URLSession.shared.dataTask(with: url) { (data, response, error) in
+            
+            DispatchQueue.main.async {
+                guard let data = data else { return }
+                print(String(data: data, encoding: String.Encoding.utf8))
+                
+                do {
+                    let details = try JSONDecoder().decode(DestinationDetails.self, from: data)
+                    self.destinationDetails = details
+                } catch {
+                    
+                }
+            }
+            
+        }.resume()
+    }
+}
+
 struct PopularDestinationDetailView: View {
+    
+    @ObservedObject var vm: DestinationDetailsViewModel
     
     let destination: Destination
     
@@ -59,7 +96,13 @@ struct PopularDestinationDetailView: View {
     init(destination: Destination) {
         self.destination = destination
         self._region = State(initialValue: MKCoordinateRegion(center: .init(latitude: destination.latitude, longitude: destination.longitude), span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)))
+        self.vm = .init(name: destination.name)
     }
+    
+    let imageUrlStrings = ["https://letsbuildthatapp-videos.s3.us-west-2.amazonaws.com/7156c3c6-945e-4284-a796-915afdc158b5",
+                                  "https://letsbuildthatapp-videos.s3-us-west-2.amazonaws.com/b1642068-5624-41cf-83f1-3f6dff8c1702",
+                                  "https://letsbuildthatapp-videos.s3-us-west-2.amazonaws.com/6982cc9d-3104-4a54-98d7-45ee5d117531",
+                                  "https://letsbuildthatapp-videos.s3-us-west-2.amazonaws.com/2240d474-2237-4cd3-9919-562cd1bb439e"]
     
     var body: some View {
         ScrollView {
@@ -74,8 +117,11 @@ struct PopularDestinationDetailView: View {
              .frame(height: 250)
              */
             
-             DestinationHeaderContainer()
-                 .frame(height: 250)
+            if let photos = vm.destinationDetails?.photos {
+                DestinationHeaderContainer(imageUrlStrings: photos)
+                     .frame(height: 250)
+            }
+            
             
             VStack(alignment: .leading) {
                 Text(destination.name)
@@ -87,7 +133,7 @@ struct PopularDestinationDetailView: View {
                             .foregroundColor(.orange)
                     }
                 }.padding(.top, 2)
-                Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+                Text(vm.destinationDetails?.description ?? "")
                     .padding(.top, 4)
                     .font(.system(size: 14))
                 HStack { Spacer() }
