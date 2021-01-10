@@ -9,6 +9,8 @@ import SwiftUI
 
 extension Color {
     static let discoverBackground = Color(.init(white: 0.95, alpha: 1))
+    static let defaultBackground = Color("defaultBackground")
+    static let tileBackground = Color("tileBackground")
 }
 
 struct DiscoveryView: View {
@@ -16,6 +18,8 @@ struct DiscoveryView: View {
     init() {
         UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor.white]
     }
+    
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         NavigationView {
@@ -42,7 +46,9 @@ struct DiscoveryView: View {
                         PopularDestinationsView()
                         PopularRestaurantsView()
                         TrendingCreatorsView()
-                    }.background(Color.discoverBackground)
+                    }
+                    .background(Color.defaultBackground)
+                    //.background(colorScheme == .light ? Color.white : Color.black)
                     .cornerRadius(16)
                     .padding(.top, 32)
                 }
@@ -55,5 +61,8 @@ struct DiscoveryView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         DiscoveryView()
+            .colorScheme(.dark)
+        DiscoveryView()
+            .colorScheme(.light)
     }
 }
